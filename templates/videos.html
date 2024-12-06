@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 250px;
+            width: calc(100vw - 250px);
+            background-color: #fff;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .content {
+            padding-top: 120px;
+        }
+    </style>
+</head>
+<body>
+    <div class="d-flex">
+        <div class="border-end position-fixed" style="width: 250px; height: 100vh;">
+            <div class="mt-5 p-3">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item border rounded bg-secondary-subtle">事務所から探す</li>
+                    <li class="list-group-item border-white">本家から探す</li>
+                    <li class="list-group-item border-white">再生リスト</li>
+                    <li class="list-group-item border-white">お気に入り</li>
+                    <li class="list-group-item border-white">視聴履歴</li>
+                </ul>
+            </div>
+        </div>
+        <div style="width: 250px; height: 100vh;"></div>
+        <div class="container-fluid p-3" style="width: calc(100vw - 250px);">
+
+            <div class="d-flex p-4 border-bottom fixed-header">
+                <a href="/" class="text-black my-auto" style="width: 50px; height: 50px;">
+                    <i class="bi bi-chevron-left display-6"></i>
+                </a>
+                <img class="ms-5 rounded-circle" src="{{ channel.channel_thumbnails }}" alt="{{ channel.channel_name }}" style="width: 75px; height: 75px;">
+                <h3 class="ms-5 my-auto">{{ channel.channel_name }}</h3>              
+            </div>
+
+            <div class="content">
+                <div class="row g-4 mt-3" id="video-container">
+                    {% for video in channel_videos %}
+                        <div class="col-md-3 col-sm-6">
+                            <div class="card h-100">
+                                <div class="position-relative">
+                                    <a href="https://www.youtube.com/watch?v={{ video.video_id }}" target="_blank">
+                                        <img class="card-img-top" src="{{ video.thumbnail_url }}" alt="{{ video.title }}" style="height: 240px; object-fit: cover;">
+                                    </a>
+                                    <div class="position-absolute bottom-0 end-0 bg-dark text-white p-1 rounded" style="margin: 5px; font-size: 0.9rem;" data-duration="{{ video.duration }}">
+                                        <!-- duration will be formatted by JavaScript -->
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ video.title }}</h5>
+                                    <p class="card-text" data-viewcount="{{ video.view_count }}" data-published="{{ video.published_at }}">
+                                        <!-- view_count and published_at will be formatted by JavaScript -->
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>        
+    </div>
+
+    <!-- JavaScript for formatting -->
+    <script>
+        // 視聴回数のフォーマット
+        function formatViewCount(viewCount) {
+            if (viewCount >= 10000) {
+                return Math.floor(viewCount / 10000) + "万回視聴";
+            } else if (viewCount >= 1000) {
+                return Math.floor(viewCount / 1000) + "千回視聴";
+            } else {
+                return viewCount + "回視聴";
+            }
+        }
+
+        // 動画の長さのフォーマット (ISO8601形式)
+        function formatDuration(duration) {
+            const minutesMatch = duration.match(/(\d+)M/);
+            const secondsMatch = duration.match(/(\d+)S/);
+            const minutes = minutesMatch ? minutesMatch[1] : "0";
+            const seconds = secondsMatch ? secondsMatch[1] : "0";
+            return `${minutes}分${seconds}秒`;
+        }
+
+        // 投稿日のフォーマット
+        function formatPublishedDate(publishedAt) {
+            const date = new Date(publishedAt);
+            return date.getFullYear() + "年" + (date.getMonth() + 1) + "月" + date.getDate() + "日";
+        }
+
+        // 各要素をフォーマットして表示
+        document.addEventListener("DOMContentLoaded", function() {
+            // durationのフォーマット
+            document.querySelectorAll("[data-duration]").forEach(function(element) {
+                element.textContent = formatDuration(element.getAttribute("data-duration"));
+            });
+
+            // view_countとpublished_atのフォーマット
+            document.querySelectorAll("[data-viewcount]").forEach(function(element) {
+                const viewCount = parseInt(element.getAttribute("data-viewcount"), 10);
+                const publishedAt = element.getAttribute("data-published");
+                element.textContent = formatViewCount(viewCount) + "・" + formatPublishedDate(publishedAt);
+            });
+        });
+    </script>
+</body>
+</html>

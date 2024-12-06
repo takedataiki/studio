@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <form class="input-group flex-nowrap mx-auto mt-5" style="width: 50%;" method="POST" action="/search_channel">
+            <input type="text" class="form-control" name="query-input" placeholder="チャンネル検索..." required>
+            <button class="btn btn-light input-group-text border" type="submit"><i class="bi bi-search"></i></button>
+        </form>
+        <ul class="list-group list-group-flush mt-5">
+            {% for item in results['items'] %}
+                <li class="list-group-item d-flex p-3">
+                    <img class="rounded-circle" src="{{ item['snippet']['thumbnails']['high']['url'] }}" alt="{{ item['snippet']['title'] }}" style="width: 100px; height: 100px;">
+                    <h2 class="ms-5 my-auto">{{ item['snippet']['title'] }}</h2>
+                    <div class="detail fixed-top" style="display:none;background-color: rgba(0, 0, 0, 0.5);width: 100vw;height: 100vh;">
+                        <div class="container bg-white mt-5 rounded">
+                            <div class="d-flex p-5">
+                                <img class="rounded-circle" src="{{ item['snippet']['thumbnails']['high']['url'] }}" alt="{{ item['snippet']['title'] }}" style="width: 100px; height: 100px;">
+                                <h2 class="ms-5 my-auto">{{ item['snippet']['title'] }}</h2>
+                            </div>
+                            <div class="p-5">
+                                <p>開設日: {{ item['snippet']['publishedAt'] }}</p>
+                            </div>
+                            <p class="border rounded mx-5 p-5 shadow">{{ item['snippet']['description'] }}</p>
+                            <form class="p-5" action="/add_channel/{{ item['id']['channelId'] }}" method="post">
+                                <input type="hidden" name="title" value="{{ item['snippet']['title'] }}">
+                                <input type="hidden" name="description" value="{{ item['snippet']['description'] }}">
+                                <input type="hidden" name="publishedAt" value="{{ item['snippet']['publishedAt'] }}">
+                                <input type="hidden" name="thumbnails" value="{{ item['snippet']['thumbnails']['high']['url'] }}">
+                                <label class="form-label" for="studio">事務所:</label>
+                                <select class="form-select mb-3" name="studio" id="studio">
+                                    {% for studio in studio_list %}
+                                    <option value="{{ studio }}">{{ studio }}</option>
+                                    {% endfor %}
+                                    <option value="other">その他</option>
+                                </select>
+                                <input class="form-control mb-3" type="text" name="new_studio">
+                                <div class="row mt-5">
+                                    <div class="col-6">
+                                        <button class="btn btn-outline-primary w-100" href="/add_channel/{{ item['id']['channelId']}}" type="submit">追加する</a>                                    
+                                    </div>
+                                    <div class="col-6">
+                                        <a class="btn btn-outline-secondary d-block mx-auto" href="https://www.youtube.com/channel/{{ item['id']['channelId'] }}" target="_blank">YouTubeに飛ぶ</a>                                    
+                                    </div>
+                                </div>
+
+                            </form>
+                            <!-- <a href="/add_channel/{{ item['id']['channelId'] }}" class="btn btn-primary ms-3">追加</a> -->                            
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <script>
+        const details = document.querySelectorAll('.detail');
+
+        document.querySelectorAll('.list-group-item').forEach((item, index) => {
+            item.addEventListener('click', function(event) {
+                // モーダルを表示する
+                details[index].style.display = 'block';
+            });
+        });
+
+        details.forEach(detail => {
+            // 背景（モーダル外）をクリックしたらモーダルを閉じる
+            detail.addEventListener('click', function(event) {
+                if (event.target === detail) {
+                    detail.style.display = 'none';
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>

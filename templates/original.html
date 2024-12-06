@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+    <div class="d-flex">
+        <div class="border-end position-fixed" style="width: 250px; height: 100vh;">
+            <div class="mt-5 p-3">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item border-white"><a class="text-black text-decoration-none" href="/">事務所から探す</a></li>
+                    <li class="list-group-item border rounded bg-secondary-subtle">本家から探す</li>
+                    <li class="list-group-item border-white">再生リスト</li>
+                    <li class="list-group-item border-white">お気に入り</li>
+                    <li class="list-group-item border-white">視聴履歴</li>
+                </ul>
+            </div>
+        </div>
+        <div style="width: 250px; height: 100vh;"></div>
+        <div class="container my-5">
+            <form class="d-flex justify-content-center mb-5" action="/original_videos" method="post">
+                <input type="text" class="form-control w-50" name="query" placeholder="検索...">
+            </form>
+            <ul class="list-group list-group-flush m-3">
+                {% for original_video in original_videos %}
+                <li class="list-group-item d-flex">
+                    <img src="{{ original_video.thumbnail_url }}" alt="{{ original_video.title }}" class="me-5" style="width: 320px; height: 240px; object-fit: cover;">  
+                    <div>
+                        <a class="text-decoration-none text-black" href="/covers/{{ original_video.video_id }}">
+                            <h3>{{ original_video.title }}</h3>
+                            <p>{{ original_video.channel_name }}</p>
+                            <p class="text-secondary">{{ original_video.view_count }}回視聴・{{ original_video.published_at }}</p>
+                            <a href="/delete_original/{{ original_video.video_id }}" class="btn btn-outline-secondary">削除</a>
+                            <p>{{ original_video.count }}</p>                        
+                        </a>
+                    </div>
+                </li>                    
+                {% endfor %}        
+            </ul>                            
+        </div>
+    </div>
+</body>
+</html>
