@@ -146,9 +146,18 @@ def original_update():
     original_videos = Original.query.all()
     return render_template('original.html', original_videos=original_videos)
 
-@app.route('/original_videos')
+@app.route('/original_videos', methods=['GET', 'POST'])
 def original_videos():
-    originals = Original.query.order_by(Original.count.desc()).all()
+    if request.method == 'POST':
+        query = request.form['query']
+        if query:
+            originals = Original.query.filter(
+                Original.title.ilike(f"%{query}%")
+            ).order_by(Original.count.desc()).all()
+        else:
+            originals = Original.query.order_by(Original.count.desc()).all()
+    else:
+        originals = Original.query.order_by(Original.count.desc()).all()
     return render_template('original.html', original_videos=originals)
 
 @app.route('/covers/<original_id>')
